@@ -117,5 +117,5 @@ CREATE TABLE Delivery_Person_Completed_Delivery (
 
 CREATE TABLE Login_Credentials (
     Username VARCHAR(255) NOT NULL,
-    Order_ID VARCHAR(255) NOT NULL
+    Password VARCHAR(255) NOT NULL
 )
