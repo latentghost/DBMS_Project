@@ -1,7 +1,7 @@
 CREATE TABLE Person (
     User_ID INT NOT NULL,
     Username VARCHAR(255) NOT NULL,
-    Password VARCHAR(255) NOT NULL,
+    Pass_word VARCHAR(255) NOT NULL,
     First_Name VARCHAR(255) NOT NULL,
     Middle_Name VARCHAR(255) NOT NULL,
     Last_Name VARCHAR(255) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE Person (
     Admin_Username VARCHAR(255) NOT NULL,
     Admin_Password VARCHAR(255) NOT NULL,
     PRIMARY KEY (User_ID),
-    FOREIGN KEY (Admin_Username) REFERENCES Admin(Username),
+    FOREIGN KEY (Admin_Username) REFERENCES Admin(Username)
 );
 
 CREATE TABLE Person_Phone (
@@ -31,7 +31,7 @@ CREATE TABLE Customer (
     Cart_Status VARCHAR(255) NOT NULL,
     Admin_Username VARCHAR(255) NOT NULL,
     Admin_Password VARCHAR(255) NOT NULL,
-    FOREIGN KEY (Admin_Username) REFERENCES Admin(Username),
+    FOREIGN KEY (Admin_Username) REFERENCES Admin(Username)
 );
 
 CREATE TABLE Customer_Delivery_Address (
@@ -55,7 +55,7 @@ CREATE TABLE Customer_Past_Order (
 CREATE TABLE Customer_Past_Searches (
     User_ID INT NOT NULL,
     Search_String VARCHAR(255) NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Customer(User_ID),
+    FOREIGN KEY (User_ID) REFERENCES Customer(User_ID)
 );
 
 CREATE TABLE Cart_Product (
@@ -76,7 +76,7 @@ CREATE TABLE Manufacturer (
     User_ID INT NOT NULL,
     Admin_Username VARCHAR(255) NOT NULL,
     Admin_Password VARCHAR(255) NOT NULL,
-    FOREIGN KEY (Admin_Username) REFERENCES Admin(Username),
+    FOREIGN KEY (Admin_Username) REFERENCES Admin(Username)
 );
 
 CREATE TABLE Manufacturer_Product_Sold (
@@ -100,7 +100,7 @@ CREATE TABLE Delivery_Person (
     Admin_Username VARCHAR(255) NOT NULL,
     PRIMARY KEY (User_ID),
     FOREIGN KEY (Active_Delivery_Request) REFERENCES Order(Order_ID),
-    FOREIGN KEY (Admin_Username) REFERENCES Admin(Username),
+    FOREIGN KEY (Admin_Username) REFERENCES Admin(Username)
 );
 
 CREATE TABLE Delivery_Person_Completed_Delivery (
@@ -122,7 +122,7 @@ CREATE TABLE Order (
 
 CREATE TABLE Product (
   Product_ID INT NOT NULL,
-  Name varchar(255) NOT NULL,
+  pName varchar(255) NOT NULL,
   Base_Price FLOAT NOT NULL,
   Discount_Percentage INT DEFAULT NULL,
   Available_Stock INT NOT NULL,
@@ -158,15 +158,15 @@ CREATE TABLE Product_Sales(
 
 CREATE TABLE Product_Category(
     Category_ID INT NOT NULL,
-    Name VARCHAR(255),
+    cName VARCHAR(255),
     Admin_Username VARCHAR(255) NOT NULL,
     Admin_Password VARCHAR(255) NOT NULL,
-    FOREIGN KEY(Admin_Username) REFERENCES Admin(Username),
+    FOREIGN KEY(Admin_Username) REFERENCES Admin(Username)
 );
 
 CREATE TABLE Admin(
     Username VARCHAR(255) NOT NULL,
-    Password VARCHAR(255) NOT NULL,
+    Pass_word VARCHAR(255) NOT NULL,
     First_Name VARCHAR(255) NOT NULL,
     Middle_Name VARCHAR(255) NOT NULL,
     Last_Name VARCHAR(255) NOT NULL,
