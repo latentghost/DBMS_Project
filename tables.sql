@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Adminn(
 
 
 CREATE TABLE IF NOT EXISTS Person (
-    User_ID INT NOT NULL,
+    User_ID INT AUTO_INCREMENT NOT NULL,
     Username VARCHAR(255) NOT NULL,
     Pass_word VARCHAR(255) NOT NULL,
     First_Name VARCHAR(255) NOT NULL,
@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS Person (
     Is_UPI_Saved VARCHAR(255) NOT NULL,
     UPI_ID VARCHAR(255),
     Admin_Username VARCHAR(255) NOT NULL,
-    Admin_Password VARCHAR(255) NOT NULL,
     PRIMARY KEY (User_ID),
     FOREIGN KEY (Admin_Username) REFERENCES Adminn(Username)
 );
@@ -42,26 +41,26 @@ CREATE TABLE IF NOT EXISTS Person_Phone (
 );
 
 CREATE TABLE IF NOT EXISTS Customer (
+    Customer_ID INT NOT NULL,
     User_ID INT NOT NULL,
     No_of_Cart_Products INT NOT NULL,
     Cart_Status VARCHAR(255) NOT NULL,
     Admin_Username VARCHAR(255) NOT NULL,
-    Admin_Password VARCHAR(255) NOT NULL,
-    PRIMARY KEY (User_ID),
+    PRIMARY KEY (Customer_ID),
+    FOREIGN KEY (User_ID) REFERENCES Person(User_ID),
     FOREIGN KEY (Admin_Username) REFERENCES Adminn(Username)
 );
 
 CREATE TABLE IF NOT EXISTS Customer_Delivery_Address (
-    User_ID INT NOT NULL,
+    Customer_ID INT NOT NULL,
     House_no INT NOT NULL,
     Street_Name VARCHAR(255),
     City VARCHAR(255) NOT NULL,
     State VARCHAR(255) NOT NULL,
     Pin_Code INT NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Customer(User_ID)
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID)
 );
-
-CREATE INDEX ind1 on Customer_Delivery_Address(User_ID);
+CREATE INDEX ind1 on Customer_Delivery_Address(Customer_ID);
 
 
 CREATE TABLE IF NOT EXISTS Orderr (
@@ -76,17 +75,17 @@ CREATE TABLE IF NOT EXISTS Orderr (
 
 
 CREATE TABLE IF NOT EXISTS Customer_Past_Orderr (
-    User_ID INT NOT NULL,
+    Customer_ID INT NOT NULL,
     Order_ID INT NOT NULL,
     Cart_Status VARCHAR(255) NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Customer(User_ID),
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID),
     FOREIGN KEY (Order_ID) REFERENCES Orderr(Order_ID)
 );
 
 CREATE TABLE IF NOT EXISTS Customer_Past_Searches (
-    User_ID INT NOT NULL,
+    Customer_ID INT NOT NULL,
     Search_String VARCHAR(255) NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Customer(User_ID)
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID)
 );
 
 
@@ -103,20 +102,22 @@ CREATE TABLE IF NOT EXISTS Product (
 );
 
 CREATE TABLE IF NOT EXISTS Cart_Product (
-    User_ID INT NOT NULL,
+    Customer_ID INT NOT NULL,
     Product_ID INT NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Customer(User_ID),
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(User_ID),
     FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
 );
 
 
 
 CREATE TABLE IF NOT EXISTS Delivery_Person (
+    DelPerson_ID INT NOT NULL,
     User_ID INT NOT NULL,
     Active_Delivery_Request INT NOT NULL,
     Delivery_Rating INT NOT NULL,
     Admin_Username VARCHAR(255) NOT NULL,
-    PRIMARY KEY (User_ID),
+    PRIMARY KEY (DelPerson_ID),
+    FOREIGN KEY(User_ID) REFERENCES Person(User_ID),
     FOREIGN KEY (Active_Delivery_Request) REFERENCES Orderr(Order_ID),
     FOREIGN KEY (Admin_Username) REFERENCES Adminn(Username)
 );
@@ -124,40 +125,42 @@ CREATE TABLE IF NOT EXISTS Delivery_Person (
 
 
 CREATE TABLE IF NOT EXISTS Customer_Pending_Orderr (
-    User_ID INT NOT NULL,
+    Customer_ID INT NOT NULL,
     Order_ID INT NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Customer(User_ID),
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(User_ID),
     FOREIGN KEY (Order_ID) REFERENCES Orderr(Order_ID)
 );
 
 
 
 CREATE TABLE IF NOT EXISTS Manufacturer (
+    Seller_ID INT NOT NULL,
     User_ID INT NOT NULL,
     Admin_Username VARCHAR(255) NOT NULL,
     Admin_Password VARCHAR(255) NOT NULL,
-    PRIMARY KEY (User_ID),
+    PRIMARY KEY(Seller_ID),
+    FOREIGN KEY (User_ID) REFERENCES Person(User_ID),
     FOREIGN KEY (Admin_Username) REFERENCES Adminn(Username)
 );
 
 CREATE TABLE IF NOT EXISTS Manufacturer_Product_Sold (
-    User_ID INT NOT NULL,
+    Seller_ID INT NOT NULL,
     Product_ID INT NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Manufacturer(User_ID),
+    FOREIGN KEY (Seller_ID) REFERENCES Manufacturer(Seller_ID),
     FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
 );
 
 CREATE TABLE IF NOT EXISTS Manufacturer_Upcoming_Product (
-    User_ID INT NOT NULL,
+    Seller_ID INT NOT NULL,
     Product_ID INT NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Manufacturer(User_ID),
+    FOREIGN KEY (Seller_ID) REFERENCES Manufacturer(Seller_ID),
     FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
 );
 
 CREATE TABLE IF NOT EXISTS Delivery_Person_Completed_Delivery (
-    User_ID INT NOT NULL,
+    DelPerson_ID INT NOT NULL,
     Order_ID INT NOT NULL,
-    FOREIGN KEY (User_ID) REFERENCES Delivery_Person(User_ID),
+    FOREIGN KEY (DelPerson_ID) REFERENCES Delivery_Person(DelPerson_ID),
     FOREIGN KEY (Order_ID) REFERENCES Orderr(Order_ID)
 );
 
@@ -179,7 +182,7 @@ CREATE TABLE IF NOT EXISTS Delivery_Request(
     Amount_Payable FLOAT NOT NULL,
     Delivery_ID INT NOT NULL,
     FOREIGN KEY(Order_ID) REFERENCES Orderr(Order_ID),
-    FOREIGN KEY(Delivery_ID) REFERENCES Customer(User_ID)
+    FOREIGN KEY(Delivery_ID) REFERENCES Customer(Customer_ID)
 );
 
 
@@ -189,7 +192,7 @@ CREATE TABLE IF NOT EXISTS Product_Sales(
     Customer_ID INT NOT NULL,
     Price FLOAT NOT NULL,
     FOREIGN KEY(Product_ID) REFERENCES Product(Product_ID),
-    FOREIGN KEY(Customer_ID) REFERENCES Customer(User_ID)
+    FOREIGN KEY(Customer_ID) REFERENCES Customer(Customer_ID)
 );
 
 CREATE TABLE IF NOT EXISTS Product_Category(
@@ -206,14 +209,14 @@ CREATE TABLE IF NOT EXISTS Admin_Customers(
     Admin_Username VARCHAR(255) NOT NULL,
     Customer_ID INT NOT NULL,
     FOREIGN KEY(Admin_Username) REFERENCES Adminn(Username),
-    FOREIGN KEY(Customer_ID) REFERENCES Customer(User_ID)
+    FOREIGN KEY(Customer_ID) REFERENCES Customer(Customer_ID)
 );
 
 CREATE TABLE IF NOT EXISTS Admin_Manufacturers(
     Admin_Username VARCHAR(255) NOT NULL,
-    Manufacturer_ID INT NOT NULL,
+    Seller_ID INT NOT NULL,
     FOREIGN KEY(Admin_Username) REFERENCES Adminn(Username),
-    FOREIGN KEY(Manufacturer_ID) REFERENCES Manufacturer(User_ID)
+    FOREIGN KEY(Seller_ID) REFERENCES Manufacturer(Seller_ID)
 );
 
 CREATE TABLE IF NOT EXISTS Admin_Products(
@@ -234,7 +237,7 @@ CREATE TABLE IF NOT EXISTS Admin_DeliveryPersons(
     Admin_Username VARCHAR(255) NOT NULL,
     DelPerson_ID INT NOT NULL,
     FOREIGN KEY(Admin_Username) REFERENCES Adminn(Username),
-    FOREIGN KEY(DelPerson_ID) REFERENCES Delivery_Person(User_ID)
+    FOREIGN KEY(DelPerson_ID) REFERENCES Delivery_Person(DelPerson_ID)
 );
 
 CREATE TABLE IF NOT EXISTS Admin_ActiveDelReqs(
@@ -257,7 +260,7 @@ CREATE TABLE IF NOT EXISTS Rates_Product(
     Customer_ID INT NOT NULL,
     Product_ID INT NOT NULL,
     Customer_Rating FLOAT NOT NULL,
-    FOREIGN KEY(Customer_ID) REFERENCES Customer(User_ID),
+    FOREIGN KEY(Customer_ID) REFERENCES Customer(Customer_ID),
     FOREIGN KEY(Product_ID) REFERENCES Product(Product_ID)
 );
 
@@ -265,6 +268,6 @@ CREATE TABLE IF NOT EXISTS Rates_Delivery(
     Customer_ID INT NOT NULL,
     Delivery_ID INT NOT NULL,
     Customer_Rating FLOAT NOT NULL,
-    FOREIGN KEY(Customer_ID) REFERENCES Customer(User_ID),
-    FOREIGN KEY(Delivery_ID) REFERENCES Delivery_Person(User_ID)
+    FOREIGN KEY(Customer_ID) REFERENCES Customer(Customer_ID),
+    FOREIGN KEY(Delivery_ID) REFERENCES Delivery_Person(DelPerson_ID)
 );
