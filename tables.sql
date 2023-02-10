@@ -78,7 +78,6 @@ CREATE TABLE Orderr (
 CREATE TABLE Customer_Past_Orderr (
     Customer_ID INT NOT NULL,
     Order_ID INT NOT NULL,
-    Cart_Status VARCHAR(255) NOT NULL,
     FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID),
     FOREIGN KEY (Order_ID) REFERENCES Orderr(Order_ID)
 );
@@ -200,7 +199,6 @@ CREATE TABLE Product_Sales(
 CREATE TABLE Product_Category(
     Category_ID INT AUTO_INCREMENT NOT NULL,
     cName VARCHAR(255),
-    Admin_Username VARCHAR(255) NOT NULL,
     PRIMARY KEY (Category_ID),
     FOREIGN KEY(Admin_Username) REFERENCES Adminn(Username)
 );
