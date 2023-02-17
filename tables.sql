@@ -1400,6 +1400,29 @@ INSERT INTO `Product` (`Product_ID`, `pName`, `Base_Price`, `Discount_Percentage
 INSERT INTO `Product` (`Product_ID`, `pName`, `Base_Price`, `Discount_Percentage`, `Available_Stock`, `Avg_Delivery_Time`, `Product_Rating`, `TotRatings`) VALUES (200, 'quaerat', '24592100', 56, 56, '2023-01-18 01:55:51', '4','10');
 
 
+CREATE TABLE Product_Category(
+    Category_ID INT AUTO_INCREMENT NOT NULL,
+    cName VARCHAR(255),
+    PRIMARY KEY (Category_ID)
+);
+
+#
+# TABLE STRUCTURE FOR: Product_Category
+#
+
+INSERT INTO Product_Category(Category_ID,cName) VALUES (1,'Electronics');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (2,'Home & Kitchen');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (3,'Clothing');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (4,'Furniture');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (5,'Books & Toys');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (6,'Sports & Outdoor');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (7,'Health & Wellness');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (8,'Automotive Accessories');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (9,'Food & Grocery');
+INSERT INTO Product_Category(Category_ID,cName) VALUES (10,'Shoes');
+
+
+
 #
 # TABLE STRUCTURE FOR: Product_PCategory
 #
@@ -1594,7 +1617,7 @@ INSERT INTO `Customer_Pending_Orderr` (`Customer_ID`, `Order_ID`) VALUES (100, 1
 
 CREATE TABLE Manufacturer (
     Seller_ID INT AUTO_INCREMENT NOT NULL,
-    User_ID INT NOT NULL
+    User_ID INT NOT NULL,
     PRIMARY KEY(Seller_ID),
     FOREIGN KEY (User_ID) REFERENCES Person(User_ID)
 );
@@ -2612,27 +2635,6 @@ INSERT INTO `Product_Sales` (`Product_ID`, `Customer_ID`, `Price`) VALUES (198, 
 INSERT INTO `Product_Sales` (`Product_ID`, `Customer_ID`, `Price`) VALUES (199, 99, '8060');
 INSERT INTO `Product_Sales` (`Product_ID`, `Customer_ID`, `Price`) VALUES (200, 100, '248');
 
-
-CREATE TABLE Product_Category(
-    Category_ID INT AUTO_INCREMENT NOT NULL,
-    cName VARCHAR(255),
-    PRIMARY KEY (Category_ID)
-);
-
-#
-# TABLE STRUCTURE FOR: Product_Category
-#
-
-INSERT INTO Product_Category(Category_ID,cName) VALUES (1,'Electronics');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (2,'Home & Kitchen');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (3,'Clothing');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (4,'Furniture');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (5,'Books & Toys');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (6,'Sports & Outdoor');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (7,'Health & Wellness');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (8,'Automotive Accessories');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (9,'Food & Grocery');
-INSERT INTO Product_Category(Category_ID,cName) VALUES (10,'Shoes');
 
 
 CREATE TABLE Admin_Customers(
