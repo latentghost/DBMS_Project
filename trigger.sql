@@ -41,8 +41,9 @@ AFTER INSERT ON Delivery_Request
 FOR EACH ROW
 BEGIN
     DECLARE del_id INT;
-    SELECT DelPerson_ID INTO del_id FROM Delivery_Persons WHERE Active_Delivery_Request IS NULL;
-    CASE
-        WHEN del_id IS NOT NULL THEN
-        UPDATE Delivery_Request SET Delivery_Status = 1,
-        UPDATE Delivery_Persons SET Active_Delivery_Request = NEW.Order_ID;
+    SELECT DelPerson_ID INTO del_id FROM Delivery_Persons WHERE Active_Delivery_Request IS NULL LIMIT 1;
+    IF del_id IS NOT NULL THEN
+        UPDATE Delivery_Request SET Delivery_Status = 1 WHERE Order_ID = NEW.Order_ID;
+        UPDATE Delivery_Persons SET Active_Delivery_Request = NEW.Order_ID WHERE DelPerson_ID = del_id;
+    END IF;
+END;
