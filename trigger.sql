@@ -11,3 +11,17 @@ BEGIN
 END;
 
 
+-- check for validity of username when person tries to change username
+CREATE TRIGGER check_username
+BEFORE UPDATE ON Person
+FOR EACH ROW
+BEGIN
+    CASE
+        WHEN LENGTH(NEW.Username)<10 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT 'Username too short';
+        WHEN NEW.Username = OLD.Username THEN
+            SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT 'New Username must be different from Old Username';
+        WHEN NEW.Username != OLD.Username AND EXISTS (SELECT * FROM Person WHERE Username = NEW.Username) THEN
+            SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT 'Username already exists, please try a different one';
+    END CASE;
+END;
