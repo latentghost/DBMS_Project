@@ -64,8 +64,8 @@ WHERE DelPerson_ID = @del_id;
 
 
 # view order history for a given customer
-SELECT po.* FROM Customer_Past_Orderr po
-INNER JOIN Orderr o ON po.Order_ID = o.Order_ID
+SELECT o.* FROM Orderr o
+INNER JOIN Customer_Past_Orderrs po ON o.Order_ID = po.Order_ID
 WHERE po.Customer_ID = ?;
 
 
