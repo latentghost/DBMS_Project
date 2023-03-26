@@ -60,3 +60,26 @@ SELECT dp.DelPerson_ID, COUNT(*) AS total_orders_delivered
 FROM Delivery_Person dp
 JOIN Orderr o ON dp.Active_Delivery_Request = o.Order_ID
 GROUP BY dp.DelPerson_ID
+
+-- pending deliveries by region with rollup
+SELECT cd.State AS State, cd.City AS City, cd.Street_Name AS Street_Name, Count(*) AS TotalIncompleteDeliveries
+FROM Customer_Pending_Orderr cp
+INNER JOIN Customer_Delivery_Address cd
+ON cp.Customer_ID = cd.Customer_ID
+GROUP BY State, City, Street_Name WITH ROLLUP;
+
+-- amount classification and by time
+SELECT *
+FROM (
+	SELECT 
+	  YEAR(dr.Expected_Completion_Time) AS year,
+	  MONTH(dr.Expected_Completion_Time) AS month,
+	  DAY(dr.Expected_Completion_Time) AS day,
+	  IF(Amount_Payable > 100000, 'Large', IF(Amount_Payable > 10000 AND Amount_Payable < 100000, 'Medium', 'Small')) AS AmountClassification,
+	  Count(*) AS OrderCount
+	FROM Delivery_Request dr
+	GROUP BY year, month, day, AmountClassification
+) ams
+WHERE ams.AmountClassification = 'Medium'
+GROUP BY AmountClassification, OrderCount, year, month, day WITH ROLLUP
+HAVING Grouping(AmountClassification) = 0 AND Grouping(OrderCount) = 0 AND Grouping(year) = 0;
