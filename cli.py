@@ -115,6 +115,7 @@ print('''1. Add a new product category
 6. View pending deliveries for each region
 7. Add product to customer's cart
 8. Change customer username
+9. Exit
 ''')
 
 while(True):
@@ -134,12 +135,13 @@ while(True):
             break
         else:
             params = (res[0],)
-        cur.execute("""SELECT po.* FROM Customer_Past_Orderr po
-                    INNER JOIN Orderr o ON po.Order_ID = o.Order_ID
+        cur.execute("""SELECT o.* FROM Orderr o
+                    INNER JOIN Customer_Past_Orderr po ON o.Order_ID = po.Order_ID
                     WHERE po.Customer_ID = %s;""",params)
         res = cur.fetchall()
+        print("Order ID     Product Total       Taxes       Delivery Fee       Grand Total")
         for row in res:
-            print(row)
+            print(row[0],"      ",row[2],"      ",row[3],"      ",row[4],"      ",row[5])
     elif(case==3):
         cur.execute("""SELECT c.Category_ID AS Category_ID, c.Product_ID AS Product_ID, c.pName AS pName, Sum(ps.ProductSales) AS TotalSales
                     FROM (
@@ -156,8 +158,10 @@ while(True):
                     ON ps.Product_ID = c.Product_ID
                     GROUP BY Category_ID, Product_ID, pName WITH ROLLUP;""")
         res = cur.fetchall()
+        print("Category ID      Product ID      Product Name        Total Sales")
         for row in res:
-            print(row)
+            if(row[2] != None):
+                print(row[0],"      ",row[1],"      ",row[2],"      ",row[3])
     elif(case==4):
         cur.execute("""SELECT c.cName AS category_name, AVG(p.Product_Rating) AS avg_rating
                     FROM Product p
@@ -165,8 +169,9 @@ while(True):
                     JOIN Product_Category c ON pc.Category_ID = c.Category_ID
                     GROUP BY c.Category_ID""")
         res = cur.fetchall()
+        print("Category         Avg Rating")
         for row in res:
-            print(row)
+            print(row[0],"      ",(int(row[1]*100)/100.0))
     elif(case==5):
         cur.execute("""SELECT ad.State AS State, ad.City AS City, ad.Street_Name AS Street_Name, Count(*) AS TotalOrders
                     FROM Delivery_Person_Completed_Delivery dc
@@ -179,8 +184,9 @@ while(True):
                     ON dc.Order_ID = ad.Order_ID
                     GROUP BY State, City, Street_Name WITH ROLLUP;""")
         res = cur.fetchall()
+        print("State        City        Street Name     No of Orders")
         for row in res:
-            print(row)
+            print(row[0],"      ",row[1],"      ",row[2],"      ",row[3])
     elif(case==6):
         cur.execute("""SELECT cd.State AS State, cd.City AS City, cd.Street_Name AS Street_Name, Count(*) AS TotalIncompleteDeliveries
                     FROM Customer_Pending_Orderr cp
@@ -188,14 +194,16 @@ while(True):
                     ON cp.Customer_ID = cd.Customer_ID
                     GROUP BY State, City, Street_Name WITH ROLLUP;""")
         res = cur.fetchall()
+        print("State        City        Street Name     No of Pending Deliveries")
         for row in res:
-            print(row)
+            print(row[0],"      ",row[1],"      ",row[2],"      ",row[3])
     elif(case==7):
         cur.execute("SELECT * FROM Product")
         res = cur.fetchall()
+        print("Product ID       Product Name        Price       Product Rating")
         for row in res:
-            print(row)
-        pid = int(input("Choose product to add to cart: "))
+            print(row[0],"          ",row[1],"          ",row[2]*(1-row[3]/100.0),"         ",row[6])
+        pid = int(input("Choose product (ID) to add to cart: "))
         q = int(input("Enter quantity: "))
         params = (userid, pid, q)
         try:
@@ -210,6 +218,8 @@ while(True):
             cur.execute("UPDATE Person SET Username = %s WHERE User_ID = %s;",params)
         except con.Error as err:
             print("Error: ",err.msg)
+    elif(case==9):
+        break
     else:
         print("Invalid input")
 
