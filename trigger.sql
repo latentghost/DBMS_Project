@@ -30,17 +30,22 @@ END;
 
 
 -- creation of delivery request
+DELIMITER $$
+DROP TRIGGER IF EXISTS create_delivery_request;
 CREATE TRIGGER create_delivery_request
 AFTER INSERT ON Orderr
 FOR EACH ROW
 BEGIN
     INSERT INTO Delivery_Request (Order_ID, Delivery_Status, Expected_Completion_Time, Amount_Payable, Delivery_ID)
     VALUES (NEW.Order_ID, 0, DATE_ADD(CURDATE(), INTERVAL 7 DAY), NEW.Grand_Total, NEW.Customer_ID);
-END;
+END$$
+DELIMITER ;
 
 
 
 -- checking for available delivery person
+DELIMITER $$
+DROP TRIGGER IF EXISTS assign_delivery_person;
 CREATE TRIGGER assign_delivery_person
 AFTER INSERT ON Delivery_Request
 FOR EACH ROW
@@ -51,4 +56,5 @@ BEGIN
         UPDATE Delivery_Request SET Delivery_Status = 1 WHERE Order_ID = NEW.Order_ID;
         UPDATE Delivery_Persons SET Active_Delivery_Request = NEW.Order_ID WHERE DelPerson_ID = del_id;
     END IF;
-END;
+END$$
+DELIMITER ;
