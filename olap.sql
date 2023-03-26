@@ -28,3 +28,35 @@ INNER JOIN (
 ) ad
 ON dc.Order_ID = ad.Order_ID
 GROUP BY State, City, Street_Name WITH ROLLUP;
+
+
+-- find the total number of products sold by each manufacturer
+SELECT m.Seller_ID, COUNT(*) AS Total_Products_Sold
+FROM Manufacturer m
+INNER JOIN Manufacturer_Product_Sold mps ON m.Seller_ID = mps.Seller_ID
+GROUP BY m.Seller_ID;
+
+
+-- find the most popular product categories
+SELECT pc.cName, COUNT(*) AS Total_Products_Sold
+FROM Product_Category pc
+INNER JOIN Product_PCategory ppc ON pc.Category_ID = ppc.Category_ID
+INNER JOIN Product p ON ppc.Product_ID = p.Product_ID
+GROUP BY pc.Category_ID
+ORDER BY Total_Products_Sold DESC
+LIMIT 5;
+
+
+-- find the average product rating for each category
+SELECT c.cName AS category_name, AVG(p.Product_Rating) AS avg_rating
+FROM Product p
+JOIN Product_PCategory pc ON p.Product_ID = pc.Product_ID
+JOIN Product_Category c ON pc.Category_ID = c.Category_ID
+GROUP BY c.Category_ID
+
+
+-- find the total number of orders delivered by each delivery person
+SELECT dp.DelPerson_ID, COUNT(*) AS total_orders_delivered
+FROM Delivery_Person dp
+JOIN Orderr o ON dp.Active_Delivery_Request = o.Order_ID
+GROUP BY dp.DelPerson_ID
