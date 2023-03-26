@@ -164,8 +164,8 @@ while(True):
                     ON ps.Product_ID = c.Product_ID
                     GROUP BY Category_ID, Product_ID, pName WITH ROLLUP;""")
         res = cur.fetchall()
-        res.insert(0, ["Category ID", "Product ID", "Product Name", "Total Sales"])
         new = []
+        new.append(["Category ID", "Product ID", "Product Name", "Total Sales"])
         for row in res:
             if(row[2] != None):
                 new.append([row[0], row[1], row[2], row[3]])
