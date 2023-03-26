@@ -1,33 +1,30 @@
 import mysql.connector as con
-
-db = con.connect(
-    host = "localhost",
-    user = "root",
-    password = "Popoye@456",
-    database = "online_retail_store",
-)
+config = {
+    'host': "localhost",
+    'user': "root",
+    'password': "dl9ca6293",
+    'database': "online_retail_store"
+}
+db = con.connect(**config)
 
 cur1 = db.cursor()
-cur2 = db.cursor()
-cur3 = db.cursor()
-cur4 = db.cursor()
 
-while(True):
-    user = input("Username: ")
-    pasw = input("Password: ")
+# while(True):
+#     user = input("Username: ")
+#     pasw = input("Password: ")
 
-    quer = "SELECT * FROM Person WHERE Username = %s AND Pass_word = %s"
-    params = (user,pasw)
-    cur1.execute(quer,params)
+#     quer = "SELECT * FROM Person WHERE Username = %s AND Pass_word = %s"
+#     params = (user,pasw)
+#     cur1.execute(quer,params)
 
-    res = cur1.fetchone()
+#     res = cur1.fetchone()
 
-    userid = -1
-    if res is not None:
-        userid = res[0]
-        break
+#     userid = -1
+#     if res is not None:
+#         userid = res[0]
+#         break
 
-    print("Invalid Login Credentials, please try again")
+#     print("Invalid Login Credentials, please try again")
 
 
 trigger1 = """
@@ -87,19 +84,36 @@ END;"""
 
 
 cur1.execute(trigger1)
-res1 = cur1.fetchall()
-cur2.execute(trigger2)
-res2 = cur2.fetchall()
-cur3.execute(trigger3)
-res3 = cur3.fetchall()
-cur4.execute(trigger4)
-res4 = cur4.fetchall()
-
-db.commit()
+# res1 = cur1.fetchall()
+# db.commit()
 cur1.close()
+
+db = con.connect(**config)
+cur2 = db.cursor()
+cur2.execute(trigger2)
+# res2 = cur2.fetchall()
+# db.commit()
 cur2.close()
+
+db = con.connect(**config)
+cur3 = db.cursor()
+cur3.execute(trigger3)
+# res3 = cur3.fetchall()
+# db.commit()
 cur3.close()
+
+db = con.connect(**config)
+cur4 = db.cursor()
+cur4.execute(trigger4)
+# res4 = cur4.fetchall()
 cur4.close()
+db = con.connect(**config)
+db.commit()
+
+
+
+
+
 
 
 cur = db.cursor()
