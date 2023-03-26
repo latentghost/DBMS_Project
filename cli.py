@@ -218,9 +218,13 @@ while(True):
     elif(case==7):
         cur.execute("SELECT * FROM Product")
         res = cur.fetchall()
-        print("Product ID       Product Name        Price       Product Rating")
+        new = []
+        new.append(["Product ID", "Product Name", "Price", "Product Rating"])
+        print()
         for row in res:
-            print(row[0],"          ",row[1],"          ",row[2]*(1-row[3]/100.0),"         ",row[6])
+            new.append([row[0], row[1], row[2]*(1-row[3]/100.0), row[6]])
+        
+        print(tabulate(new))
         pid = int(input("Choose product (ID) to add to cart: "))
         q = int(input("Enter quantity: "))
         params = (userid, pid, q)
