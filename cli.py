@@ -2,29 +2,29 @@ import mysql.connector as con
 config = {
     'host': "localhost",
     'user': "root",
-    'password': "dl9ca6293",
+    'password': "Popoye@456",
     'database': "online_retail_store"
 }
 db = con.connect(**config)
 
 cur1 = db.cursor()
 
-# while(True):
-#     user = input("Username: ")
-#     pasw = input("Password: ")
+while(True):
+    user = input("Username: ")
+    pasw = input("Password: ")
 
-#     quer = "SELECT * FROM Person WHERE Username = %s AND Pass_word = %s"
-#     params = (user,pasw)
-#     cur1.execute(quer,params)
+    quer = "SELECT * FROM Person WHERE Username = %s AND Pass_word = %s"
+    params = (user,pasw)
+    cur1.execute(quer,params)
 
-#     res = cur1.fetchone()
+    res = cur1.fetchone()
 
-#     userid = -1
-#     if res is not None:
-#         userid = res[0]
-#         break
+    userid = -1
+    if res is not None:
+        userid = res[0]
+        break
 
-#     print("Invalid Login Credentials, please try again")
+    print("Invalid Login Credentials, please try again")
 
 
 trigger1 = """
@@ -53,6 +53,7 @@ BEGIN
             SIGNAL SQLSTATE '45001' SET MESSAGE_TEXT = 'New Username must be different from Old Username';
         WHEN NEW.Username != OLD.Username AND EXISTS (SELECT * FROM Person WHERE Username = NEW.Username) THEN
             SIGNAL SQLSTATE '45002' SET MESSAGE_TEXT = 'Username already exists, please try a different one';
+        
     END CASE;
 END;"""
 
@@ -84,53 +85,134 @@ END;"""
 
 
 cur1.execute(trigger1)
-# res1 = cur1.fetchall()
-# db.commit()
 cur1.close()
 
 db = con.connect(**config)
 cur2 = db.cursor()
 cur2.execute(trigger2)
-# res2 = cur2.fetchall()
-# db.commit()
 cur2.close()
 
 db = con.connect(**config)
 cur3 = db.cursor()
 cur3.execute(trigger3)
-# res3 = cur3.fetchall()
-# db.commit()
 cur3.close()
 
 db = con.connect(**config)
 cur4 = db.cursor()
 cur4.execute(trigger4)
-# res4 = cur4.fetchall()
 cur4.close()
 db = con.connect(**config)
 db.commit()
 
 
-
-
-
-
-
 cur = db.cursor()
-
 
 print('''1. Add a new product category
 2. View Order History for a customer
 3. View category-wise sales
 4. View average product rating for each category
 5. View state-wise orders
-6. Add product to customer's cart
-7. Change customer username
-8. Place order
+6. View pending deliveries for each region
+7. Add product to customer's cart
+8. Change customer username
 ''')
 
-# while(True):
-#     case = int(input("Enter query to execute: "))
+while(True):
+    case = int(input("Enter query to execute: "))
+
+    if(case==1):
+        params = (input("Enter new category name: "),)
+        cur.execute("""INSERT INTO Product_Category(Category_ID, cName) 
+                    SELECT MAX(Category_ID) + 1, %s 
+                    FROM Product_Category;""",params)
+    elif(case==2):
+        p = (userid,)
+        cur.execute("SELECT * FROM Customer WHERE User_ID = %s",p)
+        res = cur.fetchone()
+        if res is None:
+            print("Log in as Customer to view your order history")
+            break
+        else:
+            params = (res[0],)
+        cur.execute("""SELECT po.* FROM Customer_Past_Orderr po
+                    INNER JOIN Orderr o ON po.Order_ID = o.Order_ID
+                    WHERE po.Customer_ID = %s;""",params)
+        res = cur.fetchall()
+        for row in res:
+            print(row)
+    elif(case==3):
+        cur.execute("""SELECT c.Category_ID AS Category_ID, c.Product_ID AS Product_ID, c.pName AS pName, Sum(ps.ProductSales) AS TotalSales
+                    FROM (
+                        SELECT Product_ID, Sum(Price) AS ProductSales 
+                        FROM Product_Sales 
+                        GROUP BY Product_ID
+                    ) ps
+                    INNER JOIN (
+                        SELECT Product_PCategory.Category_ID, Product.Product_ID, Product.pName
+                        FROM Product 
+                        INNER JOIN Product_PCategory 
+                        ON Product.Product_ID = Product_PCategory.Product_ID
+                    ) c
+                    ON ps.Product_ID = c.Product_ID
+                    GROUP BY Category_ID, Product_ID, pName WITH ROLLUP;""")
+        res = cur.fetchall()
+        for row in res:
+            print(row)
+    elif(case==4):
+        cur.execute("""SELECT c.cName AS category_name, AVG(p.Product_Rating) AS avg_rating
+                    FROM Product p
+                    JOIN Product_PCategory pc ON p.Product_ID = pc.Product_ID
+                    JOIN Product_Category c ON pc.Category_ID = c.Category_ID
+                    GROUP BY c.Category_ID""")
+        res = cur.fetchall()
+        for row in res:
+            print(row)
+    elif(case==5):
+        cur.execute("""SELECT ad.State AS State, ad.City AS City, ad.Street_Name AS Street_Name, Count(*) AS TotalOrders
+                    FROM Delivery_Person_Completed_Delivery dc
+                    INNER JOIN (
+                        SELECT cd.State, cd.City, cd.Street_Name, Orderr.Order_ID
+                        FROM Orderr
+                        INNER JOIN Customer_Delivery_Address cd
+                        ON Orderr.Customer_ID = cd.Customer_ID
+                    ) ad
+                    ON dc.Order_ID = ad.Order_ID
+                    GROUP BY State, City, Street_Name WITH ROLLUP;""")
+        res = cur.fetchall()
+        for row in res:
+            print(row)
+    elif(case==6):
+        cur.execute("""SELECT cd.State AS State, cd.City AS City, cd.Street_Name AS Street_Name, Count(*) AS TotalIncompleteDeliveries
+                    FROM Customer_Pending_Orderr cp
+                    INNER JOIN Customer_Delivery_Address cd
+                    ON cp.Customer_ID = cd.Customer_ID
+                    GROUP BY State, City, Street_Name WITH ROLLUP;""")
+        res = cur.fetchall()
+        for row in res:
+            print(row)
+    elif(case==7):
+        cur.execute("SELECT * FROM Product")
+        res = cur.fetchall()
+        for row in res:
+            print(row)
+        pid = int(input("Choose product to add to cart: "))
+        q = int(input("Enter quantity: "))
+        params = (userid, pid, q)
+        try:
+            cur.execute("INSERT INTO `Cart_Product` (`Customer_ID`, `Product_ID`, `Quantity`) VALUES (%s,%s,%s);",params)
+            db.commit()
+        except con.Error as err:
+            print("Error: ",err.msg)
+    elif(case==8):
+        newuser = input("Enter new username: ")
+        params = (newuser,userid,)
+        try:
+            cur.execute("UPDATE Person SET Username = %s WHERE User_ID = %s;",params)
+        except con.Error as err:
+            print("Error: ",err.msg)
+    else:
+        print("Invalid input")
+
 
 cur.close()
 db.close()
