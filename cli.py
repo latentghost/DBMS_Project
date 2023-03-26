@@ -1,8 +1,9 @@
+from tabulate import tabulate
 import mysql.connector as con
 config = {
     'host': "localhost",
     'user': "root",
-    'password': "Popoye@456",
+    'password': "dl9ca6293",
     'database': "online_retail_store"
 }
 db = con.connect(**config)
@@ -139,9 +140,14 @@ while(True):
                     INNER JOIN Customer_Past_Orderr po ON o.Order_ID = po.Order_ID
                     WHERE po.Customer_ID = %s;""",params)
         res = cur.fetchall()
-        print("Order ID     Product Total       Taxes       Delivery Fee       Grand Total")
-        for row in res:
-            print(row[0],"      ",row[2],"      ",row[3],"      ",row[4],"      ",row[5])
+        new = []
+        for i in range(0, len(res)):
+            row = res[i]
+            new.append([row[0], row[2], row[3], row[4], row[5]])
+        new.insert(0, ["Order ID", "Product Total", "Taxes", "Delivery Fee", "Grand Total"])
+        print(tabulate(new))
+        # for row in res:
+        #     print(row[0],"      ",row[2],"      ",row[3],"      ",row[4],"      ",row[5])
     elif(case==3):
         cur.execute("""SELECT c.Category_ID AS Category_ID, c.Product_ID AS Product_ID, c.pName AS pName, Sum(ps.ProductSales) AS TotalSales
                     FROM (
@@ -158,10 +164,13 @@ while(True):
                     ON ps.Product_ID = c.Product_ID
                     GROUP BY Category_ID, Product_ID, pName WITH ROLLUP;""")
         res = cur.fetchall()
-        print("Category ID      Product ID      Product Name        Total Sales")
+        res.insert(0, ["Category ID", "Product ID", "Product Name", "Total Sales"])
+        new = []
         for row in res:
             if(row[2] != None):
-                print(row[0],"      ",row[1],"      ",row[2],"      ",row[3])
+                new.append([row[0], row[1], row[2], row[3]])
+        print(tabulate(new))
+        
     elif(case==4):
         cur.execute("""SELECT c.cName AS category_name, AVG(p.Product_Rating) AS avg_rating
                     FROM Product p
@@ -169,9 +178,12 @@ while(True):
                     JOIN Product_Category c ON pc.Category_ID = c.Category_ID
                     GROUP BY c.Category_ID""")
         res = cur.fetchall()
-        print("Category         Avg Rating")
+        new = []
+        new.append(["Category", "Avg Rating"])
         for row in res:
-            print(row[0],"      ",(int(row[1]*100)/100.0))
+            new.append([row[0], (int(row[1]*100)/100.0)])
+        
+        print(tabulate(new))
     elif(case==5):
         cur.execute("""SELECT ad.State AS State, ad.City AS City, ad.Street_Name AS Street_Name, Count(*) AS TotalOrders
                     FROM Delivery_Person_Completed_Delivery dc
@@ -184,9 +196,12 @@ while(True):
                     ON dc.Order_ID = ad.Order_ID
                     GROUP BY State, City, Street_Name WITH ROLLUP;""")
         res = cur.fetchall()
-        print("State        City        Street Name     No of Orders")
+        new = []
+        new.append(["State", "City", "Street Name", "No of Orders"])
         for row in res:
-            print(row[0],"      ",row[1],"      ",row[2],"      ",row[3])
+            new.append([row[0], row[1], row[2], row[3]])
+
+        print(tabulate(new))
     elif(case==6):
         cur.execute("""SELECT cd.State AS State, cd.City AS City, cd.Street_Name AS Street_Name, Count(*) AS TotalIncompleteDeliveries
                     FROM Customer_Pending_Orderr cp
@@ -194,9 +209,12 @@ while(True):
                     ON cp.Customer_ID = cd.Customer_ID
                     GROUP BY State, City, Street_Name WITH ROLLUP;""")
         res = cur.fetchall()
-        print("State        City        Street Name     No of Pending Deliveries")
+        new = []
+        new.append(["State", "City", "Street Name", "No of Pending Deliveries"])
         for row in res:
-            print(row[0],"      ",row[1],"      ",row[2],"      ",row[3])
+            new.append([row[0], row[1], row[2], row[3]])
+
+        print(tabulate(new))
     elif(case==7):
         cur.execute("SELECT * FROM Product")
         res = cur.fetchall()
