@@ -119,7 +119,7 @@ CREATE TABLE Product (
   Base_Price FLOAT NOT NULL,
   Discount_Percentage INT DEFAULT NULL,
   Available_Stock INT NOT NULL,
-  Avg_Delivery_Time datetime DEFAULT NULL,
+  Avg_Delivery_Time INT DEFAULT NULL,
   Product_Rating FLOAT DEFAULT NULL,
   TotRatings INT,
   PRIMARY KEY (Product_ID)
