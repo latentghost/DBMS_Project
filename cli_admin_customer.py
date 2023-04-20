@@ -779,6 +779,7 @@ Welcome to the Online Retail Store!
             case2 = int(input("Select an option to proceed: "))
             if (case2 == 1):
                 while True:
+                    #need to loop and print over the categories instead, since a category could be added
                     print('''
 \n------------------\n
 1. Electronics
