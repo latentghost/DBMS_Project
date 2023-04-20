@@ -191,7 +191,8 @@ userid = -1
 
 # Main Menu
 while(True):
-    print("""1. Register
+    print("""
+    1. Register
     2. Login
     3. Exit
     """)
@@ -235,7 +236,8 @@ while(True):
 
         p = (usr,pas,nam,mid,las,ema,csv,car,cna,exp,usv,upi)
 
-        print("""What would you like to register as?
+        print("""
+        What would you like to register as?
         1. Customer
         2. Manufacturer
         3. Delivery Person
@@ -289,6 +291,8 @@ while(True):
     else:
         print("Invalid choice! Please try again")
 
+    print("\n")
+
 
 # After login/register
 p = (userid,)
@@ -300,13 +304,14 @@ if res is not None:
     mid = res[0]
 
     while(True):
-        print('''1. Add new product
-            2. Update product details
-            3. View Product Sales
-            4. Change username
-            5. Change password
-            6. Logout\n
-            ''')
+        print('''
+        1. Add new product
+        2. Update product details
+        3. View Product Sales
+        4. Change username
+        5. Change password
+        6. Logout
+        ''')
         case = int(input("Enter choice: "))
 
         if(case==1):
@@ -327,8 +332,8 @@ if res is not None:
             delt = int(input("Expected Delivery Time (days): "))
 
             p = (name,bprice,disc,stock,delt)
-            cur.execute("""INSERT INTO
-                Product(`pName`, `Base_Price`, `Discount_Percentage`, `Available_Stock`, `Avg_Delivery_Time`, `Product_Rating`, `TotRatings`)
+            cur.execute("""INSERT INTO Product(`pName`, `Base_Price`, `Discount_Percentage`,
+                `Available_Stock`, `Avg_Delivery_Time`, `Product_Rating`, `TotRatings`)
                 VALUES (%s,%s,%s,%s,%s,0.0,0);""",p)
             
             print("Choose Product Category:")
@@ -355,7 +360,6 @@ if res is not None:
 
             print("Product added!\n")
 
-
         elif(case==2):
             print("Choose product:")
             cur.execute("""SELECT p.Product_ID, p.pName FROM Product p
@@ -376,7 +380,8 @@ if res is not None:
                     break
                 print("Invalid! Please enter a valid Product ID.")
 
-            print('''Choose what to update:
+            print('''
+            Choose what to update:
             1. Product Name
             2. Base Price
             3. Discount
@@ -494,7 +499,8 @@ else:
         did = res[0]
 
         while(True):
-            print('''1. View Active Delivery Request
+            print('''
+            1. View Active Delivery Request
             2. Update delivery status
             3. Accept new delivery request
             4. Change username
@@ -521,11 +527,12 @@ else:
                 print(tabulate(new))
 
             elif(case==2):
-                print("Choose updated status: ")
-                print('''1. Pending pick-up
-                    2. Order picked up, pending Delivery
-                    3. Order Delivered
-                    ''')
+                print('''
+                Choose updated status:
+                1. Pending pick-up
+                2. Order picked up, pending Delivery
+                3. Order Delivered
+                ''')
                 ch = int(input("Enter choice: "))
 
                 if(ch==1 or ch==2):
@@ -602,6 +609,8 @@ else:
 
             else:
                 print("Invalid! Please enter a valid choice.")
+            
+            print("\n")
 
 
 
