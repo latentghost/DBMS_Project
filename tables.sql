@@ -1454,11 +1454,11 @@ INSERT INTO `Cart_Product` (`Customer_ID`, `Product_ID`, `Quantity`) VALUES (1,7
 
 
 CREATE TABLE Delivery_Person (
-    DelPerson_ID INT NOT NULL,
+    DelPerson_ID INT AUTO_INCREMENT NOT NULL,
     User_ID INT NOT NULL,
-    Active_Delivery_Request INT NOT NULL,
-    Delivery_Rating INT NOT NULL,
-    TotRatings INT,
+    Active_Delivery_Request INT,
+    Delivery_Rating INT,
+    TotRatings INT NOT NULL,
     PRIMARY KEY (DelPerson_ID),
     FOREIGN KEY(User_ID) REFERENCES Person(User_ID),
     FOREIGN KEY (Active_Delivery_Request) REFERENCES Orderr(Order_ID)
