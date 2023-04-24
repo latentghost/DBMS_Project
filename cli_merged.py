@@ -1062,7 +1062,7 @@ if(admin_login==1):
         elif (admin_option == 10):
             viewPendingDeliveries(cur)
         elif (admin_option == 11):
-            break
+            sys.exit()
         else:
             print("Invalid option. Please try again.")
 
@@ -1080,8 +1080,8 @@ if res is not None:
     while(True):
         print('''
 \n------------------\n
-1. Add new product
-2. Update product details
+1. Add new Product
+2. Update Product details
 3. View Product Sales
 4. Change username
 5. Change password
@@ -1415,7 +1415,8 @@ Choose updated status:
 3. Checkout cart
 4. View Order History
 5. Change username
-6. Back
+6. Change password
+7. Back
 \n------------------\n
                 ''')
                 case2 = int(input("Select an option to proceed: "))
@@ -1449,6 +1450,12 @@ Choose updated status:
                 elif (case2 == 5):
                     changeUsername(cur, userid)
                 elif (case2 == 6):
+                    oldpas = input("Enter old password: ")
+                    cur.execute("SELECT Pass_Word FROM Person WHERE User_ID = %s;",(userid,))
+                    if(oldpas!=cur.fetchone()[0]):
+                        print("Invalid password!")
+                        continue
+                elif (case2 == 7):
                     break
 
         else:
