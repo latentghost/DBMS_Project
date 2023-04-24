@@ -1,4 +1,5 @@
-## Shoppable
+## User Guide
+### Shoppable
 
 *Welcome to “Shoppable”!!*  
 
