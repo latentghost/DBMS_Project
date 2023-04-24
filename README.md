@@ -8,5 +8,5 @@ Register/Log-in
 ----
 
 1. New users can register as a Customer, Seller or a Delivery person
-  &nbsp;&nbsp;&nbsp;* To register, users must provide the following information:
+    * To register, users must provide the following information:
 
