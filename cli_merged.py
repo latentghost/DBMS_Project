@@ -1083,9 +1083,10 @@ if res is not None:
 1. Add new Product
 2. Update Product details
 3. View Product Sales
-4. Change username
-5. Change password
-6. Logout
+4. View category-wise sales
+5. Change username
+6. Change password
+7. Logout
 \n------------------\n
         ''')
         case = int(input("Enter choice: "))
@@ -1223,8 +1224,35 @@ Choose what to update:
             for row in sales:
                 new.append([row[0],row[1],row[2],row[3]])
             print(tabulate(new))
-
+        
         elif(case==4):
+            cur.execute("""SELECT c.Category_ID AS Category_ID, c.Product_ID AS Product_ID, c.pName AS pName, Sum(ps.ProductSales) AS TotalSales
+                FROM (
+                    SELECT p.Product_ID, Sum(p.Price) AS ProductSales 
+                    FROM Product_Sales p
+                    INNER JOIN (SELECT * FROM Manufacturer_Product_Sold WHERE Seller_ID = %s) mps
+                    ON mps.Product_ID = p.Product_ID
+                    GROUP BY p.Product_ID
+                ) ps
+                INNER JOIN (
+                    SELECT Product_PCategory.Category_ID, Product.Product_ID, Product.pName
+                    FROM (SELECT * FROM Product 
+                    INNER JOIN Product_PCategory 
+                    ON Product.Product_ID = Product_PCategory.Product_ID ) p
+                    INNER JOIN (SELECT * FROM Manufacturer_Product_Sold WHERE Seller_ID = %s) mps
+                    ON mps.Product_ID = p.Product_ID
+                ) c
+                ON ps.Product_ID = c.Product_ID
+                GROUP BY Product_PCategory.Category_ID, Product.Product_ID, Product.pName WITH ROLLUP;""",(mid,mid))
+            res = cur.fetchall()
+            new = []
+            new.append(["Category ID", "Product ID", "Product Name", "Total Sales"])
+            for row in res:
+                if(row[2] != None):
+                    new.append([row[0], row[1], row[2], row[3]])
+            print(tabulate(new))
+
+        elif(case==5):
             newuser = input("Enter new username: ")
             params = (newuser,userid,)
             try:
@@ -1232,7 +1260,7 @@ Choose what to update:
             except con.Error as err:
                 print("Error: ",err.msg)
 
-        elif(case==5):
+        elif(case==6):
             oldpas = input("Enter old password: ")
             cur.execute("SELECT Pass_Word FROM Person WHERE User_ID = %s;",(userid,))
             if(oldpas!=cur.fetchone()[0]):
@@ -1257,7 +1285,7 @@ Choose what to update:
             cur.execute("UPDATE Person SET Pass_Word = %s WHERE User_ID = %s;",params)
             print("Password updated!")
                 
-        elif(case==6):
+        elif(case==7):
             y = input("Are you sure you wish to log out? (Yes/No) ")
             if(y=="no" or y=="No" or y=="n" or y=="N"):
                 continue
