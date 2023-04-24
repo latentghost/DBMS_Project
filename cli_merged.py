@@ -1035,7 +1035,7 @@ if(admin_login==1):
 6. Remove a manufacturer
 7. View category-wise sales
 8. View average product rating for each category
-9. View state-wise orders
+9. View region-wise orders
 10. View pending deliveries for each region
 11. Logout
 \n------------------\n
