@@ -4,6 +4,7 @@
 
 *Shoppable is an online retail store that allows users to buy and sell latest products online. Explore a vast variety of products, and get high quality products at extremely low prices delivered to your doorstep.*  
 
+----
 Register/Log-in
 ----
 - New users can register as a Customer, Seller or a Delivery person
@@ -17,7 +18,7 @@ Register/Log-in
 - All users can choose to change their username and password at any point, if they wish to; however, the new username or password must be unique i.e. it must not be in use for any other user and can also not be the same as the old username or password of the particular user
 - When logging out, the user is logged out from the system, and exits the application
 
-
+----
 Customers
 ----
 - View and add Products to Cart
@@ -37,6 +38,7 @@ Customers
   * Information available to the customer include the Order ID, Product Total Cost, Taxes charged, Shipping fee, and the Total Billing amount
 
 
+----
 Manufacturers (or Sellers)
 ----
 - Add new Product
@@ -49,6 +51,7 @@ Manufacturers (or Sellers)
   * Sellers can view individual product sales or choose to view product sales grouped by product categories
 
 
+----
 Delivery Person
 ----
 - View Active Delivery Request
@@ -64,6 +67,7 @@ Delivery Person
   * They may choose from all the currently pending delivery requests, details of which are available for the delivery person to browse
 
 
+----
 Admin
 ----
 - Add/Remove a Product Category
