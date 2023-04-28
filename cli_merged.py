@@ -77,7 +77,7 @@ END;"""
 # --------------------------------- Define Transactions --------------------------------------
 
 tran1 = """
-BEGIN TRANSACTION;
+START TRANSACTION;
 
 SET @did = (SELECT DelPerson_ID FROM Delivery_Person WHERE DelPerson_ID = %s);
 SET @oid = (
@@ -105,7 +105,7 @@ COMMIT;
 
 
 tran2 = """
-BEGIN TRANSACTION;
+START TRANSACTION;
 
 SET @did = (SELECT DelPerson_ID FROM Delivery_Person WHERE DelPerson_ID = %s);
 SET @oid = (SELECT Order_ID FROM Orderr WHERE Order_ID = %s);
@@ -129,7 +129,7 @@ COMMIT;
 
 
 tran3 = """
-BEGIN TRANSACTION;
+START TRANSACTION;
 
 INSERT INTO Person (`Username`, `Pass_word`, `First_Name`, `Middle_Name`,
 `Last_Name`, `Email_ID`, `Is_Card_Saved`, `Card_no`, `Name_on_Card`, `Expire_Date`, `Is_UPI_Saved`, `UPI_ID`)
@@ -146,7 +146,7 @@ COMMIT;
 
 
 tran4 = """
-BEGIN TRANSACTION;
+START TRANSACTION;
 
 INSERT INTO Person (`Username`, `Pass_word`, `First_Name`, `Middle_Name`,
 `Last_Name`, `Email_ID`, `Is_Card_Saved`, `Card_no`, `Name_on_Card`, `Expire_Date`, `Is_UPI_Saved`, `UPI_ID`)
@@ -163,7 +163,7 @@ COMMIT;
 
 
 tran5 = """
-BEGIN TRANSACTION;
+START TRANSACTION;
 
 INSERT INTO Person (`Username`, `Pass_word`, `First_Name`, `Middle_Name`,
 `Last_Name`, `Email_ID`, `Is_Card_Saved`, `Card_no`, `Name_on_Card`, `Expire_Date`, `Is_UPI_Saved`, `UPI_ID`)
@@ -995,9 +995,9 @@ Welcome to the Online Retail Store!
                 break
 
             quer = "SELECT * FROM Person WHERE Username = %s AND Pass_word = %s;"
-            cur1.execute(quer,params)
+            cur.execute(quer,params)
 
-            res = cur1.fetchone()
+            res = cur.fetchone()
 
             if res is not None:
                 userid = res[0]
@@ -1118,7 +1118,9 @@ if res is not None:
             out = cur.fetchall()
             i = 1
             for c in out:
-                print(i + ".",c)
+                print(str(i) + ".",c[1])
+                i+=1
+            print(str(i)+".","Exit")
             
             while(True):
                 cat = int(input("Enter choice: "))
@@ -1127,13 +1129,16 @@ if res is not None:
                 else:
                     break
             
-            p = (out[cat-1],)
-            cur.execute("""INSERT INTO Product_Category(cName)
-            VALUES (%s""",p)
+            cur.execute("SELECT Product_ID FROM Product WHERE Product_ID = LAST_INSERT_ID();")
+            pid = cur.fetchall()
+            pid = pid[0][0]
+            p = (pid,cat)
+            cur.execute("""INSERT INTO `Product_PCategory`(`Product_ID`,`Category_ID`)
+            VALUES (%s,%s);""",p)
 
-            p = (mid,pid)
+            p1 = (mid,pid)
             cur.execute("""INSERT INTO Manufacturer_Product_Sold (Seller_ID, Product_ID)
-            VALUES (%s, %s);""",p)
+            VALUES (%s,%s);""",p1)
 
             print("Product added!\n")
 
@@ -1141,14 +1146,15 @@ if res is not None:
             print("Choose product:")
             cur.execute("""SELECT p.Product_ID, p.pName FROM Product p
                 INNER JOIN Manufacturer_Product_Sold mp ON p.Product_ID = mp.Product_ID
-                INNER JOIN Manufacturer m ON m.Seller_ID = mp.Seller_ID
-                WHERE manufacturer.Manufacturer_ID = %s;""")
+                WHERE mp.Seller_ID = %s;""",(mid,))
             prs = cur.fetchall()
             ids = []
             pid = -1
+            new = [["Product ID","Product Name"]]
             for p in prs:
                 ids.append(p[0])
-                print(p[0] + ".", p[1])
+                new.append([str(p[0]), p[1]])
+            print(tabulate(new))
             
             while(True):
                 prod = int(input("Enter product ID: "))
@@ -1220,30 +1226,30 @@ Choose what to update:
 
             print("Your Product Sales:")
             new = []
-            new.append(["Product Name","Product ID","Units Sold","Sales amount"])
+            new.append(["Product Name","Product ID","Sales amount","Units Sold"])
             for row in sales:
                 new.append([row[0],row[1],row[2],row[3]])
             print(tabulate(new))
         
         elif(case==4):
-            cur.execute("""SELECT c.Category_ID AS Category_ID, c.Product_ID AS Product_ID, c.pName AS pName, Sum(ps.ProductSales) AS TotalSales
+            cur.execute("""SELECT c.Category_ID AS C_ID, c.pids AS P_ID, c.pName AS PNames, Sum(ps.ProductSale) AS TotalSales
                 FROM (
-                    SELECT p.Product_ID, Sum(p.Price) AS ProductSales 
+                    SELECT p.Product_ID, Sum(p.Price) AS ProductSale 
                     FROM Product_Sales p
                     INNER JOIN (SELECT * FROM Manufacturer_Product_Sold WHERE Seller_ID = %s) mps
                     ON mps.Product_ID = p.Product_ID
                     GROUP BY p.Product_ID
                 ) ps
                 INNER JOIN (
-                    SELECT Product_PCategory.Category_ID, Product.Product_ID, Product.pName
-                    FROM (SELECT * FROM Product 
+                    SELECT p.Category_ID, p.Product_ID AS pids, p.pName
+                    FROM (SELECT Product.Product_ID, Product_PCategory.Category_ID, Product.pName FROM Product 
                     INNER JOIN Product_PCategory 
                     ON Product.Product_ID = Product_PCategory.Product_ID ) p
                     INNER JOIN (SELECT * FROM Manufacturer_Product_Sold WHERE Seller_ID = %s) mps
                     ON mps.Product_ID = p.Product_ID
                 ) c
-                ON ps.Product_ID = c.Product_ID
-                GROUP BY Product_PCategory.Category_ID, Product.Product_ID, Product.pName WITH ROLLUP;""",(mid,mid))
+                ON ps.Product_ID = c.pids
+                GROUP BY c.Category_ID, c.pids, c.pName WITH ROLLUP;""",(mid,mid))
             res = cur.fetchall()
             new = []
             new.append(["Category ID", "Product ID", "Product Name", "Total Sales"])
@@ -1294,8 +1300,6 @@ Choose what to update:
         else:
             print("Invalid! Please enter a valid choice.")
         
-        print("\n")
-
 
 # --------------------------------- Delivery Person --------------------------------------
 
@@ -1315,7 +1319,7 @@ else:
 3. Accept new delivery request
 4. Change username
 5. Change password
-6. Log out
+6. Logout
 \n------------------\n
             ''')
 
@@ -1323,7 +1327,7 @@ else:
 
             if(case==1):
                 p = (did,)
-                cur.execute("""SELECT o.Order_ID, o.Customer_ID, o.GrandTotal AS Amount_Payable, o.Payment_Mode
+                cur.execute("""SELECT o.Order_ID, o.Customer_ID, o.Grand_Total AS Amount_Payable, o.Payment_Mode
                     FROM Delivery_Person dp
                     INNER JOIN Orderr o ON dp.Active_Delivery_Request = o.Order_ID
                     WHERE dp.DelPerson_ID = %s;""",p)
@@ -1374,12 +1378,13 @@ Choose updated status:
                 new = []
                 new.append(["Order ID", "Expected Delivery Time", "Total Amount"])
                 for row in drs:
-                    new.append([drs[0],drs[1],drs[2]])
+                    new.append([row[0],row[1],row[2]])
                 print(tabulate(new))
 
                 oid = int(input("Choose Order ID: "))
                 p = (did,oid)
                 cur.execute(tran2,p)
+                cur.fetchall()
 
             elif(case==4):
                 newuser = input("Enter new username: ")
@@ -1422,9 +1427,7 @@ Choose updated status:
 
             else:
                 print("Invalid! Please enter a valid choice.")
-            
-            print("\n")
-    
+                
 
 # --------------------------------- Customer --------------------------------------
 
@@ -1444,7 +1447,7 @@ Choose updated status:
 4. View Order History
 5. Change username
 6. Change password
-7. Back
+7. Logout
 \n------------------\n
                 ''')
                 case2 = int(input("Select an option to proceed: "))
@@ -1456,7 +1459,9 @@ Choose updated status:
                         out = cur.fetchall()
                         i = 1
                         for c in out:
-                            print(i + ".",c)
+                            print(str(i) + ".",c[1])
+                            i+=1
+                        print(str(i)+".","Exit")
                         print("\n------------------\n")
 
                         try:
@@ -1487,7 +1492,7 @@ Choose updated status:
                     break
 
         else:
-            print("Invalid input, please try again\n")
+            print("Invalid input, please try again")
 
 
 # --------------------------------- End --------------------------------------
