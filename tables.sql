@@ -33,7 +33,7 @@ CREATE TABLE Person (
     Card_no BIGINT,
     Name_on_Card VARCHAR(255),
     Expire_Date DATE,
-    Is_UPI_Saved VARCHAR(255) NOT NULL,
+    Is_UPI_Saved INT NOT NULL,
     UPI_ID VARCHAR(255),
     PRIMARY KEY (User_ID)
 );
